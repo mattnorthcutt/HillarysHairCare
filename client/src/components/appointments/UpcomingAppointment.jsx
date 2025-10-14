@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Table } from "reactstrap";
-import { getUpcomingAppointments } from "../../data/appointmentsData";
+import { cancelAppointment, getUpcomingAppointments } from "../../data/appointmentsData";
 import { Link } from "react-router-dom";
 export default function UpcomingAppointments() {
   const [appts, setAppts] = useState([]);
@@ -8,6 +8,11 @@ export default function UpcomingAppointments() {
   useEffect(() => {
     getUpcomingAppointments().then(setAppts);
   }, []);
+
+  const onCancel = (id) => 
+    cancelAppointment(id).then(() => 
+      getUpcomingAppointments().then(setAppts)
+    )
 
   const dateTimeFormat = (dt) => new Date(dt).toLocaleString();
 
@@ -34,6 +39,11 @@ export default function UpcomingAppointments() {
               <td>{a.stylist?.firstName} {a.stylist?.lastName}</td>
               <td>
               <Link to={`/appointments/${a.id}`}> Details </Link>
+              </td>
+              <td>
+                {!a.isCanceled && (
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => onCancel(a.id)}>Cancel</button>
+                )}
               </td>
             </tr>
           ))}

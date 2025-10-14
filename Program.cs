@@ -142,4 +142,18 @@ app.MapPut("/api/stylists/{id}/reactivate", (HillaryDbContext db, int id) =>
     return Results.NoContent();
 });
 
+app.MapPut("/api/appointments/{id}/cancel", (HillaryDbContext db, int id) =>
+{
+    var appt = db.Appointments.Find(id);
+    if (appt is null) return Results.NotFound();
+
+    if (!appt.IsCanceled)
+    {
+        appt.IsCanceled = true;
+        db.SaveChanges();
+    }
+
+    return Results.NoContent();
+});
+
 app.Run();
