@@ -31,4 +31,16 @@ app.MapGet("/api/services", (HillaryDbContext db) =>
     }).ToList();
 });
 
+app.MapGet("/api/customers", (HillaryDbContext db) =>
+{
+    return db.Customers.Select(c => new
+    {
+        c.Id,
+        c.FirstName,
+        c.LastName,
+        c.Email,
+        c.Phone,
+    }).ToList();
+});
+
 app.Run();
