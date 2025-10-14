@@ -14,3 +14,11 @@ export const cancelAppointment = (id) => {
     headers: { 'Content-Type': 'application/json' },
   }).then (() => {})
 }
+
+export const createAppointment = (payload) => {
+  return fetch(`/api/appointments`, {
+    method:'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then((r) => r.json())
+}
