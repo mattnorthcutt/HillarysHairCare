@@ -11,6 +11,7 @@ function App() {
           <NavLink href="/services"> Services </NavLink>
           <NavLink href="/customers"> Customers </NavLink>
           <NavLink href="/stylists"> Stylists </NavLink>
+          <NavLink href="/appointments/upcoming"> Upcoming Appts. </NavLink>
         </Nav>
       </Navbar>
       <Outlet />

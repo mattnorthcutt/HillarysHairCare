@@ -56,5 +56,15 @@ app.MapGet("/api/stylists", (HillaryDbContext db) =>
         .ToList();
 });
 
+app.MapGet("/api/appointments/upcoming", (HillaryDbContext db) =>
+{
+    return db.Appointments.Where(a => !a.IsCanceled && a.StartTime >= DateTime.Now).Include(a => a.Customer).Include(a => a.Stylist).Select(a => new
+    {
+        a.Id,
+        a.StartTime,
+        Customer = new { a.Customer.Id, a.Customer.FirstName, a.Customer.LastName },
+        Stylist = new { a.Stylist.Id, a.Stylist.FirstName, a.Stylist.LastName }
+    }).ToList();
+});
 
 app.Run();
