@@ -1,4 +1,5 @@
 using HillarysHairCare.Models;
+using HillarysHairCare.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
@@ -121,7 +122,7 @@ app.MapPost("/api/customers", (HillaryDbContext db, Customer c) =>
 {
     db.Customers.Add(c);
     db.SaveChanges();
-    return Results.Created($"/apo/customers/{c.Id}", c);
+    return Results.Created($"/api/customers/{c.Id}", c);
 });
 
 app.MapPut("/api/stylists/{id}/deactivate", (HillaryDbContext db, int id) =>
@@ -155,5 +156,45 @@ app.MapPut("/api/appointments/{id}/cancel", (HillaryDbContext db, int id) =>
 
     return Results.NoContent();
 });
+
+app.MapPost("/api/appointments", (HillaryDbContext db, CreateAppointmentDTO dto) =>
+{
+    var stylist = db.Stylists.Find(dto.StylistId);
+    if (!stylist.IsActive) return Results.BadRequest("Inactive Stylist");
+
+    var appt = new Appointment
+    {
+        CustomerId = dto.CustomerId,
+        StylistId  = dto.StylistId,
+        StartTime  = dto.StartTime, 
+        IsCanceled = false
+    };
+
+    db.Appointments.Add(appt);
+    db.SaveChanges();
+
+    if (dto.ServiceIds != null)
+    {
+        foreach (var sid in dto.ServiceIds)
+        {
+            db.AppointmentServices.Add(new AppointmentService
+            {
+                AppointmentId = appt.Id,
+                ServiceId     = sid
+            });
+        }
+        db.SaveChanges();
+    }
+
+    return Results.Created($"/api/appointments/{appt.Id}", new
+    {
+        appt.Id,
+        appt.CustomerId,
+        appt.StylistId,
+        appt.StartTime,
+        ServiceIds = dto.ServiceIds
+    });
+});
+
 
 app.Run();
