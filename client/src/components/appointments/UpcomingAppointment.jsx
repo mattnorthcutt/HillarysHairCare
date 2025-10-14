@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Table } from "reactstrap";
+import { NavLink, Table } from "reactstrap";
 import { getUpcomingAppointments } from "../../data/appointmentsData";
+import { Link } from "react-router-dom";
 export default function UpcomingAppointments() {
   const [appts, setAppts] = useState([]);
 
@@ -31,8 +32,12 @@ export default function UpcomingAppointments() {
               <td>{dateTimeFormat(a.startTime)}</td>
               <td>{a.customer?.firstName} {a.customer?.lastName}</td>
               <td>{a.stylist?.firstName} {a.stylist?.lastName}</td>
+              <td>
+              <Link to={`/appointments/${a.id}`}> Details </Link>
+              </td>
             </tr>
           ))}
+          
         </tbody>
       </Table>
     </div>
