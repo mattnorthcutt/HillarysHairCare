@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table } from "reactstrap";
 import { getCustomers } from "../../data/customersData";
+import { Link } from "react-router-dom";
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState([]);
@@ -13,6 +14,9 @@ export default function CustomerList() {
     <div className="container">
       <div className="sub-menu bg-light">
         <h4>Customers</h4>
+        <h5>
+          <Link to="/customers/create">Add Customer</Link>
+        </h5>
       </div>
       <Table>
         <thead>

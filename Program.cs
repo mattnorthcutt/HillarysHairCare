@@ -67,4 +67,79 @@ app.MapGet("/api/appointments/upcoming", (HillaryDbContext db) =>
     }).ToList();
 });
 
+app.MapGet("/api/appointments/{id}", (HillaryDbContext db, int id) =>
+{
+    var appt = db.Appointments
+        .Include(a => a.Customer)
+        .Include(a => a.Stylist)
+        .Include(a => a.AppointmentServices)
+        .ThenInclude(asg => asg.Service)
+        .SingleOrDefault(a => a.Id == id);
+
+    if (appt is null) return Results.NotFound();
+
+    var dto = new
+    {
+        id = appt.Id,
+        startTime = appt.StartTime,
+        isCanceled = appt.IsCanceled,
+
+        customer = appt.Customer == null ? null : new
+        {
+            appt.Customer.Id,
+            appt.Customer.FirstName,
+            appt.Customer.LastName,
+            appt.Customer.Email,
+            appt.Customer.Phone
+        },
+
+        stylist = appt.Stylist == null ? null : new
+        {
+            appt.Stylist.Id,
+            appt.Stylist.FirstName,
+            appt.Stylist.LastName,
+            appt.Stylist.IsActive
+        },
+
+        services = appt.AppointmentServices
+            .Select(s => new
+            {
+                s.Service.Id,
+                s.Service.Name,
+                s.Service.Price
+            })
+            .ToList(),
+
+        total = appt.AppointmentServices.Sum(s => s.Service.Price)
+    };
+
+    return Results.Ok(dto);
+});
+
+
+app.MapPost("/api/customers", (HillaryDbContext db, Customer c) =>
+{
+    db.Customers.Add(c);
+    db.SaveChanges();
+    return Results.Created($"/apo/customers/{c.Id}", c);
+});
+
+app.MapPut("/api/stylists/{id}/deactivate", (HillaryDbContext db, int id) =>
+{
+    var s = db.Stylists.Find(id);
+    if (s is null) return Results.NotFound();
+    s.IsActive = false;
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
+app.MapPut("/api/stylists/{id}/reactivate", (HillaryDbContext db, int id) =>
+{
+    var s = db.Stylists.Find(id);
+    if (s is null) return Results.NotFound();
+    s.IsActive = true;
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
 app.Run();
