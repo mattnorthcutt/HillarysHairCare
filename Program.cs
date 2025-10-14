@@ -20,5 +20,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/api/services", (HillaryDbContext db) =>
+{
+    return db.Services.Where(s => s.IsActive).Select(s => new 
+    {
+        s.Id,
+        s.Name,
+        s.Price,
+        s.IsActive
+    }).ToList();
+});
 
 app.Run();
